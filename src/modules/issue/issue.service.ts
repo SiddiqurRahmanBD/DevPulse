@@ -61,38 +61,42 @@ const getAllIssuesFromDB = async (query: IIssueQuery) => {
   return formattedIssues;
 };
 
-const getSigleIssueFromDB = async (id: string) => {
+const getSingleIssueFromDB = async (id: string) => {
   const result = await pool.query(
     `
-    SELECT * FROM issues WHERE id=$1
+    SELECT * FROM issues WHERE id = $1
     `,
     [id],
   );
-  // const singleUser = result.rows;
-  const reporterId = result.rows[0].reporter_id;
 
-  const reporterArray = await pool.query(
+  if (result.rows.length === 0) {
+    throw new Error("Issue not found");
+  }
+
+  const issue = result.rows[0];
+
+  const reporterResult = await pool.query(
     `
-    SELECT id,name.role FROM users WHERE id=$1
+    SELECT id, name, role
+    FROM users
+    WHERE id = $1
     `,
-    [reporterId],
+    [issue.reporter_id],
   );
-  const reporter = reporterArray.rows[0];
-  const issues = result.rows[0];
 
-  const finalResult = {
-    id: issues.id,
-    title: issues.title,
-    description: issues.description,
-    type: issues.type,
-    status: issues.status,
-    reporter: reporter,
-    created_at: issues.created_at,
-    updated_at: issues.updated_at,
+  return {
+    id: issue.id,
+    title: issue.title,
+    description: issue.description,
+    type: issue.type,
+    status: issue.status,
+    reporter: reporterResult.rows[0],
+    created_at: issue.created_at,
+    updated_at: issue.updated_at,
   };
-  return finalResult;
 };
 export const issueService = {
   createIssueIntoDB,
   getAllIssuesFromDB,
+  getSingleIssueFromDB,
 };
