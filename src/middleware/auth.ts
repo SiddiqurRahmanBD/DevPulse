@@ -5,7 +5,7 @@ import { pool } from "../db";
 
 const auth = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.headers.authorization);
+    // console.log(req.headers.authorization);
     try {
       const token = req.headers.authorization;
 
@@ -27,7 +27,6 @@ const auth = () => {
         [decoded.id],
       );
 
-      const user = userdata.rows[0] === 0;
       if (userdata.rows.length === 0) {
         return res.status(401).json({
           success: false,
@@ -35,12 +34,14 @@ const auth = () => {
         });
       }
 
-      //   if (user.role !== "contributor" && user.role !== "maintainer") {
-      //     res.status(401).json({
-      //       success: false,
-      //       message: "Unauthorized access",
-      //     });
-      //   }
+      const user = userdata.rows[0];
+
+      if (user.role !== "contributor" && user.role !== "maintainer") {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized access",
+        });
+      }
       req.user = decoded;
       next();
     } catch (error) {
