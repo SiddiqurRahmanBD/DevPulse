@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { issueService } from "./issue.service";
+import type { User } from "../../types";
 
 const createIssue = async (req: Request, res: Response) => {
   try {
@@ -59,8 +60,35 @@ const getSingleIssue = async (req: Request, res: Response) => {
     });
   }
 };
+const updateIssue = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const user = req.user;
+
+    const result = await issueService.updateIssueFromDB(
+      req.body,
+      user as User,
+      id as string,
+    );
+    console.log(result);
+    res.status(200).json({
+      success: true,
+      message: "Issue updated successfully",
+      data: result,
+    });
+  } catch (error: unknown) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
 export const issueController = {
   createIssue,
   getAllIssues,
   getSingleIssue,
+  updateIssue,
 };

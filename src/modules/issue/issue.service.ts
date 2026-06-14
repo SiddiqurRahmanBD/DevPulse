@@ -1,4 +1,5 @@
 import { pool } from "../../db";
+import type { User } from "../../types";
 import type { IIssue, IIssueQuery } from "./issue.interface";
 
 const createIssueIntoDB = async (query: IIssue, reporterId: number) => {
@@ -95,7 +96,50 @@ const getSingleIssueFromDB = async (id: string) => {
     updated_at: issue.updated_at,
   };
 };
-const updateIssueFromDB = async () => {};
+const updateIssueFromDB = async (payload: IIssue, user: User, id: string) => {
+  const issueResult = await pool.query(
+    `
+    SELECT * FROM issues
+    WHERE id = $1
+    `,
+    [id],
+  );
+
+  const issue = issueResult.rows[0];
+
+  if (!issue) {
+    throw new Error("Issue not found");
+  }
+
+  if (user.role === "contributor") {
+    if (issue.reporter_id !== user.id) {
+      throw new Error("You can only update your own issues");
+    }
+
+    if (issue.status !== "open") {
+      throw new Error("Only open issues can be updated");
+    }
+  }
+
+  const { title, description, type } = payload;
+
+  const result = await pool.query(
+    `
+    UPDATE issues
+    SET
+      title = COALESCE($1, title),
+      description = COALESCE($2, description),
+      type = COALESCE($3, type),
+      updated_at = NOW()
+    WHERE id = $4
+    RETURNING *;
+    `,
+    [title, description, type, id],
+  );
+
+  return result.rows[0];
+};
+
 export const issueService = {
   createIssueIntoDB,
   getAllIssuesFromDB,
