@@ -95,8 +95,10 @@ const getSingleIssueFromDB = async (id: string) => {
     updated_at: issue.updated_at,
   };
 };
+const updateIssueFromDB = async () => {};
 export const issueService = {
   createIssueIntoDB,
   getAllIssuesFromDB,
   getSingleIssueFromDB,
+  updateIssueFromDB,
 };
