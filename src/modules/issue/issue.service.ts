@@ -140,9 +140,11 @@ const updateIssueFromDB = async (payload: IIssue, user: User, id: string) => {
   return result.rows[0];
 };
 
+const deleteIssueFromDB = async () => {};
 export const issueService = {
   createIssueIntoDB,
   getAllIssuesFromDB,
   getSingleIssueFromDB,
   updateIssueFromDB,
+  deleteIssueFromDB,
 };

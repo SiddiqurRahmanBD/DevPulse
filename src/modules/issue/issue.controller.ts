@@ -86,9 +86,12 @@ const updateIssue = async (req: Request, res: Response) => {
     });
   }
 };
+
+const deleteIssue = async () => {};
 export const issueController = {
   createIssue,
   getAllIssues,
   getSingleIssue,
   updateIssue,
+  deleteIssue,
 };
