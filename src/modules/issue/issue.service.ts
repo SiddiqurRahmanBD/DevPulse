@@ -12,7 +12,7 @@ const createIssueIntoDB = async (query: IIssue, reporterId: number) => {
     `,
     [title, description, type, reporterId],
   );
-  return result;
+  return result.rows[0];
 };
 
 const getAllIssuesFromDB = async (query: IIssueQuery) => {
@@ -140,7 +140,26 @@ const updateIssueFromDB = async (payload: IIssue, user: User, id: string) => {
   return result.rows[0];
 };
 
-const deleteIssueFromDB = async () => {};
+const deleteIssueFromDB = async (user: User, id: string) => {
+  if (user.role !== "maintainer") {
+    throw new Error("Unauthorized access");
+  }
+
+  const result = await pool.query(
+    `
+    DELETE FROM issues
+    WHERE id = $1
+    RETURNING *;
+    `,
+    [id],
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error("Issue not found");
+  }
+
+  return result.rows[0];
+};
 export const issueService = {
   createIssueIntoDB,
   getAllIssuesFromDB,
