@@ -12,6 +12,7 @@ const createIssueIntoDB = async (query: IIssue, reporterId: number) => {
     `,
     [title, description, type, reporterId],
   );
+  delete result.rows[0].password;
   return result.rows[0];
 };
 
@@ -71,7 +72,7 @@ const getSingleIssueFromDB = async (id: string) => {
   );
 
   if (result.rows.length === 0) {
-    throw new Error("Issue not found");
+    return null;
   }
 
   const issue = result.rows[0];
@@ -141,6 +142,7 @@ const updateIssueFromDB = async (payload: IIssue, user: User, id: string) => {
 };
 
 const deleteIssueFromDB = async (user: User, id: string) => {
+
   if (user.role !== "maintainer") {
     throw new Error("Unauthorized access");
   }
@@ -155,7 +157,7 @@ const deleteIssueFromDB = async (user: User, id: string) => {
   );
 
   if (result.rows.length === 0) {
-    throw new Error("Issue not found");
+    return null;
   }
 
   return result.rows[0];

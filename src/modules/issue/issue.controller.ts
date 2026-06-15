@@ -71,7 +71,12 @@ const updateIssue = async (req: Request, res: Response) => {
       user as User,
       id as string,
     );
-    console.log(result);
+    // if (result.rows.length === 0) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "Issue not found",
+    //   });
+    // }
     res.status(200).json({
       success: true,
       message: "Issue updated successfully",
@@ -111,7 +116,7 @@ const deleteIssue = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: "Issue retrieved successfully",
+      message: "Issue deleted successfully",
       data: result,
     });
   } catch (error: unknown) {
