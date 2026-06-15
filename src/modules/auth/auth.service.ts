@@ -58,7 +58,7 @@ const loginUserIntoDB = async (payload: IuserLogin) => {
     role: user.role,
   };
   const accessToken = jwt.sign(jwtPayload, config.jwt_secret, {
-    expiresIn: "1d",
+    expiresIn: config.token_exipires_in,
   });
   const { password: _, ...safeUser } = user;
 

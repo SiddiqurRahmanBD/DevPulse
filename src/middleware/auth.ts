@@ -6,7 +6,6 @@ import sendResponse from "../utils/sendResponse";
 
 const auth = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    // console.log(req.headers.authorization);
     try {
       const token = req.headers.authorization;
 

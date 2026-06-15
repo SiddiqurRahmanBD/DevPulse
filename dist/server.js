@@ -125,39 +125,52 @@ var authService = {
   loginUserIntoDB
 };
 
+// src/utils/sendResponse.ts
+var sendResponse = (res, data) => {
+  res.status(data.statusCode).json({
+    success: data.success,
+    message: data.message,
+    data: data.data,
+    error: data.error
+  });
+};
+var sendResponse_default = sendResponse;
+
+// src/utils/errorHandle.ts
+var errorHandle = (error, res) => {
+  sendResponse_default(res, {
+    statusCode: 500,
+    success: false,
+    message: "Something went wrong",
+    error: error instanceof Error ? error.message : "Unknown error"
+  });
+};
+
 // src/modules/auth/auth.controller.ts
 var signUp = async (req, res) => {
   try {
     const result = await authService.signUpUserIntoDB(req.body);
-    console.log(result);
-    res.status(201).json({
+    sendResponse_default(res, {
+      statusCode: 200,
       success: true,
-      message: " User registered successfully",
-      data: result.rows[0]
+      message: "User registered successfully",
+      data: result
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-      error
-    });
+    errorHandle(error, res);
   }
 };
 var login = async (req, res) => {
   try {
     const result = await authService.loginUserIntoDB(req.body);
-    res.status(200).json({
+    sendResponse_default(res, {
+      statusCode: 200,
       success: true,
       message: "Login successful",
       data: result
     });
-    console.log(result);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-      error
-    });
+    errorHandle(error, res);
   }
 };
 var authController = {
@@ -317,27 +330,6 @@ var issueService = {
   deleteIssueFromDB
 };
 
-// src/utils/sendResponse.ts
-var sendResponse = (res, data) => {
-  res.status(data.statusCode).json({
-    success: data.success,
-    message: data.message,
-    data: data.data,
-    error: data.error
-  });
-};
-var sendResponse_default = sendResponse;
-
-// src/utils/errorHandle.ts
-var errorHandle = (error, res) => {
-  sendResponse_default(res, {
-    statusCode: 500,
-    success: false,
-    message: "Something went wrong",
-    error: error instanceof Error ? error.message : "Unknown error"
-  });
-};
-
 // src/modules/issue/issue.controller.ts
 var createIssue = async (req, res) => {
   try {
@@ -444,7 +436,8 @@ var auth = () => {
     try {
       const token = req.headers.authorization;
       if (!token) {
-        res.status(401).json({
+        return sendResponse_default(res, {
+          statusCode: 401,
           success: false,
           message: "Unauthorized access"
         });
@@ -460,14 +453,16 @@ var auth = () => {
         [decoded.id]
       );
       if (userdata.rows.length === 0) {
-        return res.status(401).json({
+        return sendResponse_default(res, {
+          statusCode: 401,
           success: false,
           message: "User not found"
         });
       }
       const user = userdata.rows[0];
       if (user.role !== "contributor" && user.role !== "maintainer") {
-        return res.status(401).json({
+        return sendResponse_default(res, {
+          statusCode: 401,
           success: false,
           message: "Unauthorized access"
         });
