@@ -34,7 +34,8 @@ A collaborative backend platform for software teams to report bugs, suggest feat
 ```bash
 
 git clone: https://github.com/SiddiqurRahmanBD/DevPulse.git
-npm install or npm i
+
+npm install
 
 ```
 ### 2. Configure Environment Variables
@@ -49,7 +50,7 @@ JWT_SECRET="Use Strong JTW Secret token"
 TOKEN_EXPIRE_IN=1d
 
 ```
-### Running App
+### 3. Running App
 
 * **For Development**
 ```bash
@@ -79,7 +80,7 @@ npm run build
 
 ## Database Schema Summary
 
-### users Table
+### 1. users Table
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -91,7 +92,7 @@ npm run build
 | created_at | TIMESTAMP | Account creation time |
 | updated_at | TIMESTAMP | Last update time |
 
-### issues Table
+### 2. issues Table
 
 | Column | Type | Description |
 |--------|------|-------------|
