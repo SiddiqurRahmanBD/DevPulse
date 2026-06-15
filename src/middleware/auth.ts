@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import { pool } from "../db";
+import sendResponse from "../utils/sendResponse";
 
 const auth = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -10,7 +11,8 @@ const auth = () => {
       const token = req.headers.authorization;
 
       if (!token) {
-        res.status(401).json({
+        return sendResponse(res, {
+          statusCode: 401,
           success: false,
           message: "Unauthorized access",
         });
@@ -28,7 +30,8 @@ const auth = () => {
       );
 
       if (userdata.rows.length === 0) {
-        return res.status(401).json({
+        return sendResponse(res, {
+          statusCode: 401,
           success: false,
           message: "User not found",
         });
@@ -37,7 +40,8 @@ const auth = () => {
       const user = userdata.rows[0];
 
       if (user.role !== "contributor" && user.role !== "maintainer") {
-        return res.status(401).json({
+        return sendResponse(res, {
+          statusCode: 401,
           success: false,
           message: "Unauthorized access",
         });
